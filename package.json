@@ -13,7 +13,7 @@
     "@tailwindcss/postcss": "^4",
     "clsx": "^2.1.1",
     "firebase": "^12.13.0",
-    "firebase-admin": "^13.G9.0",
+    "firebase-admin": "^13.9.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",
     "next": "16.2.6",
