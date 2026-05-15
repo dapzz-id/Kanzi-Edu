@@ -6,8 +6,8 @@ import { getFirestore } from "firebase-admin/firestore";
 // ─── Firebase Admin (server-side, untuk cache tanpa Auth client) ──────────────
 function getAdminDb() {
   // Hanya inisialisasi jika credentials tersedia
-  const clientEmail = process.env.NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL;
-  const privateKey = process.env.NEXT_PUBLIC_FIREBASE_PRIVATE_KEY;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY;
   const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
 
   if (!clientEmail || !privateKey || !projectId) {
@@ -26,7 +26,7 @@ function getAdminDb() {
   return getFirestore(getApp());
 }
 
-const API_KEY = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
+const API_KEY = process.env.GEMINI_API_KEY || "";
 
 export async function POST(req: Request) {
   if (!API_KEY) {
