@@ -4,6 +4,8 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Kanzi Edu | Jalur Samurai & Naga",
   description: "Aplikasi pembelajaran interaktif Bahasa Jepang & Mandarin dengan fitur gamification.",

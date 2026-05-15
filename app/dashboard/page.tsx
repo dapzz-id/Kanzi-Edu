@@ -25,6 +25,8 @@ interface UserData {
   path?: "samurai" | "dragon";
 }
 
+export const dynamic = "force-dynamic";
+
 export default function DashboardPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);

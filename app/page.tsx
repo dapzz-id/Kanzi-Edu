@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { LogIn, UserPlus } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   const router = useRouter();
 
