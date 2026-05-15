@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+*.ts diff=TypeScript
+*.tsx diff=TypeScript
+
+
+/.github export-ignore
