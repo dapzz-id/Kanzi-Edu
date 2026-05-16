@@ -1,9 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { LogIn, UserPlus } from "lucide-react";
+import { LogIn, UserPlus, ChevronRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -11,89 +10,206 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-background">
-      {/* Dynamic Split Background */}
-      <div className="absolute inset-0 flex flex-col md:flex-row w-full h-full z-0 overflow-y-auto md:overflow-hidden">
-        <motion.div 
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          className="w-full h-1/2 md:w-1/2 md:h-full bg-gradient-to-br from-[#1a0505] to-background border-b md:border-b-0 md:border-r border-primary/20 relative group overflow-hidden"
+    <main className="min-h-screen bg-[#080808] text-white relative overflow-hidden">
+
+      {/* NOISE TEXTURE overlay */}
+      <div
+        className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      {/* NAV */}
+      <nav className="relative z-50 flex items-center justify-between px-5 md:px-12 py-5">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="flex items-center gap-3"
         >
-          <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="absolute inset-0 flex items-center justify-center flex-col p-6 md:p-12 text-center z-10">
-            <h2 className="text-4xl md:text-7xl font-bold text-primary mb-2 md:mb-4 tracking-tighter mix-blend-screen drop-shadow-2xl">
-              JALUR SAMURAI
-            </h2>
-            <p className="text-foreground/80 mb-6 md:mb-8 max-w-xs md:max-w-sm text-sm md:text-lg">
-              Kuasai hiragana, katakana, dan kanji. Pelajari bahasa Jepang dari level dasar (JLPT N5) dengan disiplin seorang Samurai.
-            </p>
-            <Button size="lg" variant="samurai" className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 rounded-full group-hover:scale-105 transition-transform" onClick={() => router.push("/register")}>
-              Pilih Pedangmu
-            </Button>
+          <div className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center bg-white/5">
+            <span className="text-[10px] font-black tracking-tight">K</span>
           </div>
-          {/* Japanese Kanji Decorative */}
-          <div className="absolute -left-10 md:-left-20 bottom-0 text-[15rem] md:text-[30rem] font-bold text-primary/5 select-none pointer-events-none hidden md:block">
-            侍
-          </div>
+          <span className="text-sm font-semibold tracking-widest text-white/60 uppercase">Kanzi Edu</span>
         </motion.div>
 
-        <motion.div 
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-          className="w-full h-1/2 md:w-1/2 md:h-full bg-gradient-to-bl from-[#1a1a05] to-background relative group overflow-hidden"
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="flex gap-2"
         >
-          <div className="absolute inset-0 bg-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="absolute inset-0 flex items-center justify-center flex-col p-6 md:p-12 text-center z-10">
-            <h2 className="text-4xl md:text-7xl font-bold text-secondary mb-2 md:mb-4 tracking-tighter mix-blend-screen drop-shadow-2xl">
-              JALUR NAGA
-            </h2>
-            <p className="text-foreground/80 mb-6 md:mb-8 max-w-xs md:max-w-sm text-sm md:text-lg">
-              Pahami pinyin dan kuasai hanzi. Jelajahi bahasa Mandarin dari tingkat awal (HSK 1) dengan kebijaksanaan seekor Naga.
-            </p>
-            <Button size="lg" variant="dragon" className="text-base md:text-lg px-6 md:px-8 py-4 md:py-6 rounded-full group-hover:scale-105 transition-transform" onClick={() => router.push("/register")}>
-              Bangkitkan Nagamu
-            </Button>
-          </div>
-          {/* Chinese Character Decorative */}
-          <div className="absolute -right-10 md:-right-20 top-0 text-[15rem] md:text-[30rem] font-bold text-secondary/5 select-none pointer-events-none hidden md:block">
-            龍
-          </div>
+          <button
+            onClick={() => router.push("/login")}
+            className="flex items-center gap-1.5 text-[11px] font-medium text-white/50 hover:text-white/80
+              px-3.5 py-2 rounded-lg border border-transparent hover:border-white/10 transition-all"
+          >
+            <LogIn size={12} /> Masuk
+          </button>
+          <button
+            onClick={() => router.push("/register")}
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-white
+              px-3.5 py-2 rounded-lg bg-white/10 border border-white/15 hover:bg-white/15 transition-all"
+          >
+            <UserPlus size={12} /> Daftar
+          </button>
         </motion.div>
+      </nav>
+
+      {/* HERO HEADER */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="relative z-10 text-center px-6 pt-10 pb-12 md:pt-16 md:pb-16"
+      >
+        <p className="text-[10px] tracking-[0.35em] uppercase text-white/30 mb-4">Pilih jalurmu</p>
+        <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-none mb-4">
+          Belajar Bahasa Asia<br />
+          <span className="text-white/20">dengan cara yang epik.</span>
+        </h1>
+        <p className="text-white/40 text-sm md:text-base max-w-md mx-auto">
+          Dua jalur. Dua filosofi. Satu tujuan: fasih.
+        </p>
+      </motion.div>
+
+      {/* PATH CARDS — horizontal scroll on mobile, side-by-side on desktop */}
+      <div className="relative z-10 px-4 md:px-12 pb-16">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-5 max-w-4xl mx-auto">
+
+          {/* SAMURAI CARD */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            onClick={() => router.push("/register")}
+            className="flex-1 relative rounded-2xl overflow-hidden cursor-pointer
+              border border-[#dc4646]/20 hover:border-[#dc4646]/40
+              bg-gradient-to-b from-[#1a0707] to-[#0d0404]
+              group transition-all duration-300
+              hover:shadow-[0_20px_60px_rgba(220,70,70,0.15)]"
+          >
+            {/* Top accent */}
+            <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#dc4646] to-transparent" />
+
+            <div className="p-7 md:p-8">
+              {/* Icon area */}
+              <div className="flex items-start justify-between mb-8">
+                <div className="text-6xl md:text-7xl font-bold text-[#dc4646]/15 leading-none select-none
+                  group-hover:text-[#dc4646]/25 transition-colors duration-300 font-serif">
+                  侍
+                </div>
+                <span className="text-[9px] tracking-[0.2em] uppercase font-bold
+                  text-[#dc4646] bg-[#dc4646]/10 border border-[#dc4646]/20
+                  px-2.5 py-1 rounded-full">
+                  JLPT N5
+                </span>
+              </div>
+
+              {/* Content */}
+              <div className="mb-8">
+                <p className="text-[10px] tracking-[0.25em] uppercase text-[#dc4646]/70 mb-2 font-semibold">
+                  Bahasa Jepang
+                </p>
+                <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight leading-none mb-4">
+                  Jalur<br />Samurai
+                </h2>
+                <p className="text-white/40 text-sm leading-relaxed">
+                  Kuasai hiragana, katakana, dan kanji. Disiplin seperti seorang samurai, dari N5 sampai mahir.
+                </p>
+              </div>
+
+              {/* Features */}
+              <div className="space-y-2 mb-8">
+                {["Hiragana & Katakana", "Kanji JLPT N5", "Tata Bahasa Dasar", "Kosakata Sehari-hari"].map(f => (
+                  <div key={f} className="flex items-center gap-2.5 text-xs text-white/35">
+                    <div className="w-1 h-1 rounded-full bg-[#dc4646]/60 flex-shrink-0" />
+                    {f}
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <div className="flex items-center justify-between">
+                <button className="flex items-center gap-2 text-sm font-bold text-[#dc4646]
+                  group-hover:gap-3 transition-all duration-300">
+                  Pilih Pedangmu <ChevronRight size={14} />
+                </button>
+                <div className="w-8 h-8 rounded-full border border-[#dc4646]/20
+                  group-hover:border-[#dc4646]/50 group-hover:bg-[#dc4646]/10
+                  flex items-center justify-center transition-all duration-300">
+                  <ChevronRight size={12} className="text-[#dc4646]" />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* DRAGON CARD */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            onClick={() => router.push("/register")}
+            className="flex-1 relative rounded-2xl overflow-hidden cursor-pointer
+              border border-[#c9a832]/20 hover:border-[#c9a832]/40
+              bg-gradient-to-b from-[#17140a] to-[#0d0c04]
+              group transition-all duration-300
+              hover:shadow-[0_20px_60px_rgba(201,168,50,0.12)]"
+          >
+            <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#c9a832] to-transparent" />
+
+            <div className="p-7 md:p-8">
+              <div className="flex items-start justify-between mb-8">
+                <div className="text-6xl md:text-7xl font-bold text-[#c9a832]/15 leading-none select-none
+                  group-hover:text-[#c9a832]/25 transition-colors duration-300 font-serif">
+                  龍
+                </div>
+                <span className="text-[9px] tracking-[0.2em] uppercase font-bold
+                  text-[#c9a832] bg-[#c9a832]/10 border border-[#c9a832]/20
+                  px-2.5 py-1 rounded-full">
+                  HSK 1
+                </span>
+              </div>
+
+              <div className="mb-8">
+                <p className="text-[10px] tracking-[0.25em] uppercase text-[#c9a832]/70 mb-2 font-semibold">
+                  Bahasa Mandarin
+                </p>
+                <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight leading-none mb-4">
+                  Jalur<br />Naga
+                </h2>
+                <p className="text-white/40 text-sm leading-relaxed">
+                  Pahami pinyin dan kuasai hanzi. Kebijaksanaan naga membimbingmu dari HSK 1 menuju mahir.
+                </p>
+              </div>
+
+              <div className="space-y-2 mb-8">
+                {["Pinyin & Nada", "Hanzi HSK 1", "Percakapan Dasar", "Budaya & Konteks"].map(f => (
+                  <div key={f} className="flex items-center gap-2.5 text-xs text-white/35">
+                    <div className="w-1 h-1 rounded-full bg-[#c9a832]/60 flex-shrink-0" />
+                    {f}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <button className="flex items-center gap-2 text-sm font-bold text-[#c9a832]
+                  group-hover:gap-3 transition-all duration-300">
+                  Bangkitkan Nagamu <ChevronRight size={14} />
+                </button>
+                <div className="w-8 h-8 rounded-full border border-[#c9a832]/20
+                  group-hover:border-[#c9a832]/50 group-hover:bg-[#c9a832]/10
+                  flex items-center justify-center transition-all duration-300">
+                  <ChevronRight size={12} className="text-[#c9a832]" />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+        </div>
       </div>
 
-      {/* Center Branding */}
-      <motion.div 
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.5, type: "spring", stiffness: 100 }}
-        className="absolute z-20 flex flex-col items-center"
-      >
-        <div className="w-32 h-32 md:w-48 md:h-48 rounded-full bg-background/80 backdrop-blur-md border border-foreground/10 flex items-center justify-center shadow-2xl overflow-hidden glass">
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/50">
-              KANZI
-            </h1>
-            <p className="text-sm font-semibold tracking-widest text-foreground/50">EDU</p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Top Right Navigation (Login) */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1 }}
-        className="absolute top-6 right-6 z-30 flex gap-4"
-      >
-        <Button variant="ghost" onClick={() => router.push("/login")} className="rounded-full bg-background/20 backdrop-blur-sm border border-foreground/10 hover:bg-background/40">
-          <LogIn className="mr-2" size={16} /> Masuk
-        </Button>
-        <Button variant="outline" onClick={() => router.push("/register")} className="rounded-full bg-background/20 backdrop-blur-sm border border-foreground/10 hover:bg-background/40">
-          <UserPlus className="mr-2" size={16} /> Daftar
-        </Button>
-      </motion.div>
     </main>
   );
 }
