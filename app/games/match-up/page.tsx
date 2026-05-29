@@ -7,12 +7,18 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Trophy, Timer, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 
+interface Question {
+  char: string;
+  options: string[];
+  correct: string;
+}
+
 function MatchUpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const path = (searchParams.get("path") || "samurai") as "samurai" | "dragon";
   
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [currentQ, setCurrentQ] = useState(0);
