@@ -14,12 +14,12 @@ export async function POST(req: Request) {
     const { path, moduleLevel, moduleName } = await req.json();
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.5-flash",
       generationConfig: { responseMimeType: "application/json" },
     });
 
     const prompt = `Anda adalah guru bahasa ${path === "samurai" ? "Jepang (Samurai Path)" : "Mandarin (Dragon Path)"}.
-WAJIB: Gunakan HANYA karakter ${path === "samurai" ? "Jepang (Kanji/Hiragana/Katakana)" : "Mandarin (Hanzi)"}. 
+WAJIB: Pastikan kalimat pertanyaan/instruksi (field "text") ditulis dalam BAHASA INDONESIA. Anda HANYA boleh menggunakan karakter ${path === "samurai" ? "Jepang (Kanji/Hiragana/Katakana)" : "Mandarin (Hanzi)"} pada bagian materi yang sedang diuji (contoh: "Apa arti dari karakter X?" atau pada opsi jawaban).
 DILARANG KERAS menggunakan karakter ${path === "samurai" ? "Mandarin/Hanzi China" : "Jepang (Hiragana/Katakana)"}.
 
 Buatlah kuis kelulusan untuk modul tingkat ${moduleLevel} dengan topik "${moduleName}".
@@ -29,13 +29,13 @@ Kembalikan HANYA objek JSON berikut, tanpa teks lain:
   "multipleChoice": [
     {
       "id": 1,
-      "text": "Pertanyaan tentang kosakata atau karakter ${path === "samurai" ? "Jepang" : "Mandarin"}",
+      "text": "Pertanyaan (WAJIB Bahasa Indonesia) mengenai kosakata atau karakter ${path === "samurai" ? "Jepang" : "Mandarin"}. Contoh: 'Apa arti dari karakter ...?' atau 'Pilih terjemahan yang tepat untuk ...'",
       "options": ["A. opsi 1", "B. opsi 2", "C. opsi 3", "D. opsi 4", "E. opsi 5"],
       "correctAnswer": "A"
     }
   ],
   "essay": {
-    "text": "Satu pertanyaan esai yang menuntut jawaban ${path === "samurai" ? "romaji" : "pinyin"} atau arti bahasa Indonesia"
+    "text": "Satu pertanyaan esai (WAJIB Bahasa Indonesia) yang menuntut jawaban ${path === "samurai" ? "romaji" : "pinyin"} atau arti bahasa Indonesia. Contoh: 'Bagaimana cara membaca karakter ...?'"
   }
 }
 

@@ -7,38 +7,13 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Trophy, Timer, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 
-const GAME_DATA = {
-  samurai: [
-    { char: "あ", correct: "a", options: ["a", "i", "u", "e"] },
-    { char: "カ", correct: "ka", options: ["ki", "ka", "ku", "ke"] },
-    { char: "水", correct: "Air", options: ["Api", "Tanah", "Air", "Udara"] },
-    { char: "火", correct: "Api", options: ["Air", "Batu", "Api", "Emas"] },
-    { char: "ねこ", correct: "Kucing", options: ["Anjing", "Kucing", "Burung", "Ikan"] },
-    { char: "さくら", correct: "Bunga Sakura", options: ["Matahari", "Bunga Sakura", "Gunung", "Laut"] },
-    { char: "木", correct: "Pohon", options: ["Kayu", "Besi", "Daun", "Pohon"] },
-    { char: "すし", correct: "Sushi", options: ["Ramen", "Sushi", "Tempura", "Udon"] },
-    { char: "心", correct: "Hati", options: ["Kepala", "Tangan", "Hati", "Kaki"] },
-    { char: "山", correct: "Gunung", options: ["Lautan", "Sungai", "Gunung", "Hutan"] },
-  ],
-  dragon: [
-    { char: "一", correct: "Satu", options: ["Satu", "Dua", "Tiga", "Empat"] },
-    { char: "人", correct: "Orang", options: ["Besar", "Orang", "Kecil", "Langit"] },
-    { char: "水", correct: "Air", options: ["Api", "Tanah", "Air", "Udara"] },
-    { char: "火", correct: "Api", options: ["Air", "Batu", "Api", "Emas"] },
-    { char: "龙", correct: "Naga", options: ["Harimau", "Naga", "Burung", "Ular"] },
-    { char: "老师", correct: "Guru", options: ["Murid", "Guru", "Dokter", "Polisi"] },
-    { char: "木", correct: "Pohon", options: ["Kayu", "Besi", "Daun", "Tanah"] },
-    { char: "家", correct: "Keluarga", options: ["Sekolah", "Kantor", "Pasar", "Keluarga"] },
-    { char: "漂亮", correct: "Cantik", options: ["Ganteng", "Cantik", "Pintar", "Kaya"] },
-    { char: "大", correct: "Besar", options: ["Kecil", "Besar", "Tinggi", "Pendek"] },
-  ]
-};
-
 function MatchUpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const path = (searchParams.get("path") || "samurai") as "samurai" | "dragon";
-  const questions = GAME_DATA[path];
+  
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [currentQ, setCurrentQ] = useState(0);
   const [score, setScore] = useState(0);
@@ -46,6 +21,29 @@ function MatchUpContent() {
   const [gameOver, setGameOver] = useState(false);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const res = await fetch("/api/generate-questions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path, count: 10 }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setQuestions(data.questions);
+        } else {
+          console.error("Failed to fetch questions", data.error);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuestions();
+  }, [path]);
 
   useEffect(() => {
     if (timeLeft > 0 && !gameOver) {
@@ -88,6 +86,24 @@ function MatchUpContent() {
 
   const themeColor = path === "samurai" ? "text-primary" : "text-secondary";
   const themeBg = path === "samurai" ? "bg-primary" : "bg-secondary";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background gap-4">
+        <Loader2 className={`animate-spin ${themeColor}`} size={64} />
+        <h2 className="text-xl font-bold animate-pulse">AI sedang meracik materi belajar...</h2>
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background">
+        <h2>Gagal memuat pertanyaan.</h2>
+        <Button onClick={() => window.location.reload()} className="mt-4">Coba Lagi</Button>
+      </div>
+    );
+  }
 
   if (gameOver) {
     return (

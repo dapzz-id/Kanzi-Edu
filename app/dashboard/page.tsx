@@ -14,6 +14,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { Flame, Trophy, Swords, BookOpen, User, LogOut } from "lucide-react";
 import { SkillTree } from "@/components/SkillTree";
+import { UserActivityChart } from "@/components/UserActivityChart";
 
 interface UserData {
   name?: string;
@@ -23,6 +24,7 @@ interface UserData {
   rank?: string;
   streak?: number;
   path?: "samurai" | "dragon";
+  historyXP?: Record<string, number>;
 }
 
 export const dynamic = "force-dynamic";
@@ -266,6 +268,11 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Statistics Row */}
+      <div className="max-w-6xl mx-auto mt-8">
+        <UserActivityChart activePath={activePath} historyXP={userData.historyXP || {}} />
       </div>
     </div>
   );

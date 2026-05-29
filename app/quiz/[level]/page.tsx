@@ -97,6 +97,15 @@ export default function QuizPage({ params }: { params: Promise<{ level: string }
         else if (newXP >= 100) newRank = "Elite";
         updateData.rank = newRank;
 
+        // Mencatat log XP harian
+        const todayStr = new Date().toISOString().split("T")[0];
+        const currentHistory = snap.exists() ? (snap.data().historyXP || {}) : {};
+        const todayXP = currentHistory[todayStr] || 0;
+        updateData.historyXP = {
+          ...currentHistory,
+          [todayStr]: todayXP + 20
+        };
+
         await updateDoc(userRef, updateData);
       } catch (err) {
         console.warn("Firestore tidak tersedia, progres hanya disimpan lokal:", err);

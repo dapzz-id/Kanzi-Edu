@@ -7,24 +7,13 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 
-const PUZZLE_DATA = {
-  samurai: [
-    { words: ["私", "は", "学生", "です"], translation: "Saya adalah murid" },
-    { words: ["これ", "は", "本", "です"], translation: "Ini adalah buku" },
-    { words: ["寿司", "を", "食べます"], translation: "Makan sushi" },
-  ],
-  dragon: [
-    { words: ["我", "是", "学生"], translation: "Saya adalah murid" },
-    { words: ["这", "是", "书"], translation: "Ini adalah buku" },
-    { words: ["我", "吃", "米饭"], translation: "Saya makan nasi" },
-  ]
-};
-
 function PuzzleContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const path = (searchParams.get("path") || "samurai") as "samurai" | "dragon";
-  const levels = PUZZLE_DATA[path];
+
+  const [levels, setLevels] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [level, setLevel] = useState(0);
   const [items, setItems] = useState<string[]>([]);
@@ -32,9 +21,34 @@ function PuzzleContent() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    const fetchPuzzles = async () => {
+      try {
+        const res = await fetch("/api/generate-puzzle", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path, level: 1, count: 5 }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setLevels(data.puzzles);
+        } else {
+          console.error("Failed to fetch puzzles", data.error);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPuzzles();
+  }, [path]);
+
+  useEffect(() => {
     setMounted(true);
-    setItems([...levels[level].words].sort(() => Math.random() - 0.5));
-  }, [level, path]);
+    if (levels.length > 0) {
+      setItems([...levels[level].words].sort(() => Math.random() - 0.5));
+    }
+  }, [level, path, levels]);
 
   if (!mounted) return null;
 
@@ -59,6 +73,24 @@ function PuzzleContent() {
   };
 
   const themeColor = path === "samurai" ? "text-primary" : "text-secondary";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background gap-4">
+        <Loader2 className={`animate-spin ${themeColor}`} size={64} />
+        <h2 className="text-xl font-bold animate-pulse">AI sedang menyusun puzzle...</h2>
+      </div>
+    );
+  }
+
+  if (levels.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background">
+        <h2>Gagal memuat puzzle.</h2>
+        <Button onClick={() => window.location.reload()} className="mt-4">Coba Lagi</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col p-4 bg-background">

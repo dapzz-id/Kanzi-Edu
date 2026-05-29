@@ -55,9 +55,9 @@ export async function POST(req: Request) {
     const genAI = new GoogleGenerativeAI(API_KEY);
     const isJapanese = path === "samurai";
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-3-flash-preview",
-      generationConfig: { responseMimeType: "application/json" },
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash",
+      generationConfig: { responseMimeType: "application/json" }
     });
 
     const prompt = `Anda adalah seorang profesor bahasa ${isJapanese ? "Jepang (JLPT N5) untuk Samurai Path" : "Mandarin (HSK 1) untuk Dragon Path"} yang berpengalaman.

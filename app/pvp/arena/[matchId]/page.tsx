@@ -93,9 +93,18 @@ export default function PvPArena({ params }: { params: Promise<{ matchId: string
               else if (newXP >= 300) newRank = "Master";
               else if (newXP >= 100) newRank = "Elite";
 
+              // Mencatat log XP harian
+              const todayStr = new Date().toISOString().split("T")[0];
+              const currentHistory = snap.data().historyXP || {};
+              const todayXP = currentHistory[todayStr] || 0;
+
               await updateDoc(userRef, { 
                 xp: newXP, 
-                rank: newRank 
+                rank: newRank,
+                historyXP: {
+                  ...currentHistory,
+                  [todayStr]: todayXP + 50
+                }
               });
             }
           } catch (err) {

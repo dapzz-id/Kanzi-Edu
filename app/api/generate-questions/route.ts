@@ -22,7 +22,10 @@ Format kembalian HARUS berupa array JSON valid tanpa tambahan teks lain, seperti
 ]
 Pastikan "options" selalu berjumlah tepat 4 dan posisi "correct" diacak.`;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.5-flash",
+      generationConfig: { responseMimeType: "application/json" }
+    });
     const result = await model.generateContent(prompt);
     const responseText = result.response.text();
     

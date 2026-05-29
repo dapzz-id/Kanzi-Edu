@@ -1,30 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Volume2, CheckCircle2, XCircle, RefreshCcw } from "lucide-react";
+import { ArrowLeft, Volume2, CheckCircle2, XCircle, RefreshCcw, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const PINYIN_QUESTIONS = [
-  { char: "妈", pinyin: "mā", tone: 1, name: "Nada 1 (Datar/Tinggi)", mark: "—", meaning: "Ibu" },
-  { char: "麻", pinyin: "má", tone: 2, name: "Nada 2 (Naik)", mark: "／", meaning: "Rami/Ganja" },
-  { char: "马", pinyin: "mǎ", tone: 3, name: "Nada 3 (Melengkung)", mark: "∨", meaning: "Kuda" },
-  { char: "骂", pinyin: "mà", tone: 4, name: "Nada 4 (Turun)", mark: "＼", meaning: "Memaki" },
-  { char: "衣", pinyin: "yī", tone: 1, name: "Nada 1", mark: "—", meaning: "Baju" },
-  { char: "移", pinyin: "yí", tone: 2, name: "Nada 2", mark: "／", meaning: "Pindah" },
-  { char: "椅", pinyin: "yǐ", tone: 3, name: "Nada 3", mark: "∨", meaning: "Kursi" },
-  { char: "意", pinyin: "yì", tone: 4, name: "Nada 4", mark: "＼", meaning: "Maksud" },
-];
+interface PinyinQuestion {
+  char: string;
+  pinyin: string;
+  tone: number;
+  name: string;
+  mark: string;
+  meaning: string;
+}
 
 export default function PinyinCheckGame() {
   const router = useRouter();
+  const [questions, setQuestions] = useState<PinyinQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentQ, setCurrentQ] = useState(0);
   const [status, setStatus] = useState<"playing" | "correct" | "wrong" | "done">("playing");
   const [lastSelected, setLastSelected] = useState<number | null>(null);
 
-  const q = PINYIN_QUESTIONS[currentQ];
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const res = await fetch("/api/generate-pinyin");
+        const json = await res.json();
+        if (json.success && json.data) {
+          setQuestions(json.data);
+        } else {
+          console.error("Failed to fetch:", json.error);
+        }
+      } catch (err) {
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuestions();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background">
+        <Loader2 className="animate-spin text-secondary mb-4" size={48} />
+        <p className="text-foreground/70 font-bold uppercase tracking-widest animate-pulse text-sm">Menyiapkan Latihan Nada Harian...</p>
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background">
+        <p className="mb-4">Gagal memuat soal. Silakan coba lagi.</p>
+        <Button onClick={() => window.location.reload()}>Refresh</Button>
+      </div>
+    );
+  }
+
+  const q = questions[currentQ];
 
   const playAudio = () => {
     const utterance = new SpeechSynthesisUtterance(q.char);
@@ -42,7 +79,7 @@ export default function PinyinCheckGame() {
   };
 
   const nextQuestion = () => {
-    if (currentQ < PINYIN_QUESTIONS.length - 1) {
+    if (currentQ < questions.length - 1) {
       setCurrentQ(currentQ + 1);
       setStatus("playing");
       setLastSelected(null);
@@ -80,7 +117,7 @@ export default function PinyinCheckGame() {
         </Button>
         <div className="text-center">
           <h1 className="text-xl font-bold">Latihan Nada (Tone)</h1>
-          <p className="text-xs text-foreground/50 uppercase tracking-widest font-bold">Progress: {currentQ + 1} / {PINYIN_QUESTIONS.length}</p>
+          <p className="text-xs text-foreground/50 uppercase tracking-widest font-bold">Progress: {currentQ + 1} / {questions.length}</p>
         </div>
         <div className="w-10"></div>
       </div>
