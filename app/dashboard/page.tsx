@@ -21,10 +21,14 @@ interface UserData {
   levelSamurai?: number;
   levelDragon?: number;
   xp?: number;
+  xpSamurai?: number;
+  xpDragon?: number;
   rank?: string;
   streak?: number;
   path?: "samurai" | "dragon";
   historyXP?: Record<string, number>;
+  historyXPSamurai?: Record<string, number>;
+  historyXPDragon?: Record<string, number>;
 }
 
 export const dynamic = "force-dynamic";
@@ -103,6 +107,8 @@ export default function DashboardPage() {
   const isSamurai = activePath === "samurai";
   const themeClass = isSamurai ? "text-primary" : "text-secondary";
   const currentLevel = (isSamurai ? userData.levelSamurai : userData.levelDragon) || 1;
+  const currentXP = isSamurai ? (userData.xpSamurai || 0) : (userData.xpDragon || 0);
+  const currentHistoryXP = isSamurai ? (userData.historyXPSamurai || {}) : (userData.historyXPDragon || {});
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
@@ -202,13 +208,13 @@ export default function DashboardPage() {
                 <div className="flex justify-between text-sm">
                   <span>Level {currentLevel}</span>
                   <span className="text-foreground/50">
-                    {userData.xp || 0} / 1000 XP
+                    {currentXP} / 1000 XP
                   </span>
                 </div>
                 <div className="h-2 bg-foreground/10 rounded-full overflow-hidden">
                   <div
                     className={`h-full ${isSamurai ? "bg-primary" : "bg-secondary"}`}
-                    style={{ width: `${((userData.xp || 0) / 1000) * 100}%` }}
+                    style={{ width: `${(currentXP / 1000) * 100}%` }}
                   />
                 </div>
               </div>
@@ -272,7 +278,7 @@ export default function DashboardPage() {
 
       {/* Statistics Row */}
       <div className="max-w-6xl mx-auto mt-8">
-        <UserActivityChart activePath={activePath} historyXP={userData.historyXP || {}} />
+        <UserActivityChart activePath={activePath} historyXP={currentHistoryXP} currentXP={currentXP} streak={userData.streak || 0} />
       </div>
     </div>
   );

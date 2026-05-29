@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+
   async headers() {
     return [
       {
@@ -8,7 +9,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Cross-Origin-Opener-Policy",
-            value: "same-origin-allow-popups",
+            value: "unsafe-none",
           },
         ],
       },
@@ -28,6 +29,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_FIREBASE_APP_ID:
       process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   },
+  allowedDevOrigins: ['127.0.0.1'],
 };
 
 export default nextConfig;

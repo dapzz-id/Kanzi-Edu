@@ -13,7 +13,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "@/lib/firebase";
+import { auth, googleProvider, db } from "@/lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { LogIn, Globe, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -54,8 +55,33 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
-      router.push("/dashboard");
+      const result = await signInWithPopup(auth, googleProvider);
+      if (result.user) {
+        const userRef = doc(db, "users", result.user.uid);
+        const snap = await getDoc(userRef);
+        
+        if (!snap.exists()) {
+          // Buatkan data default jika akun Google ini benar-benar baru
+          await setDoc(
+            userRef,
+            {
+              name: result.user.displayName || "Pemain",
+              email: result.user.email,
+              path: null,
+              levelSamurai: 1,
+              levelDragon: 1,
+              xp: 0,
+              xpSamurai: 0,
+              xpDragon: 0,
+              rank: "Warrior",
+              streak: 0,
+              createdAt: new Date(),
+            },
+            { merge: true },
+          );
+        }
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       if (err.code !== "auth/popup-closed-by-user") {
         setError("Gagal login dengan Google.");

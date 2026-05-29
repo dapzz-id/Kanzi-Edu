@@ -9,7 +9,7 @@ import { Loader2, CheckCircle2, XCircle, ArrowRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { use } from "react";
 import { auth, db } from "@/lib/firebase";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc, setDoc } from "firebase/firestore";
 
 interface MultipleChoice {
   id: number;
@@ -88,25 +88,40 @@ export default function QuizPage({ params }: { params: Promise<{ level: string }
         // Update XP (+20 XP per kuis selesai)
         const currentXP = snap.exists() ? (snap.data().xp || 0) : 0;
         const newXP = currentXP + 20;
-        updateData.xp = newXP;
 
-        // Update Rank secara dinamis
+        // Tentukan field berdasarkan path
+        const data = snap.exists() ? snap.data() : {};
+        const todayStr = new Date().toISOString().split("T")[0];
+
+        if (path === "samurai") {
+          updateData.xpSamurai = (data.xpSamurai || 0) + 20;
+          const currentHistory = data.historyXPSamurai || {};
+          const todayXP = currentHistory[todayStr] || 0;
+          updateData.historyXPSamurai = {
+            ...currentHistory,
+            [todayStr]: todayXP + 20
+          };
+        } else {
+          updateData.xpDragon = (data.xpDragon || 0) + 20;
+          const currentHistory = data.historyXPDragon || {};
+          const todayXP = currentHistory[todayStr] || 0;
+          updateData.historyXPDragon = {
+            ...currentHistory,
+            [todayStr]: todayXP + 20
+          };
+        }
+        
+        // Tetap simpan total xp untuk perhitungan Rank
+        updateData.xp = newXP;
+        
+        // Update Rank secara dinamis berdasarkan total XP
         let newRank = "Warrior";
         if (newXP >= 600) newRank = "Grandmaster";
         else if (newXP >= 300) newRank = "Master";
         else if (newXP >= 100) newRank = "Elite";
         updateData.rank = newRank;
 
-        // Mencatat log XP harian
-        const todayStr = new Date().toISOString().split("T")[0];
-        const currentHistory = snap.exists() ? (snap.data().historyXP || {}) : {};
-        const todayXP = currentHistory[todayStr] || 0;
-        updateData.historyXP = {
-          ...currentHistory,
-          [todayStr]: todayXP + 20
-        };
-
-        await updateDoc(userRef, updateData);
+        await setDoc(userRef, updateData, { merge: true });
       } catch (err) {
         console.warn("Firestore tidak tersedia, progres hanya disimpan lokal:", err);
       }

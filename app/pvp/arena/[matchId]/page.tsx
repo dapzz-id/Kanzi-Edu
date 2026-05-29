@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Swords, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
-import { doc, onSnapshot, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, onSnapshot, arrayUnion, setDoc } from "firebase/firestore";
 
 interface PvPQuestion {
   char: string;
@@ -84,29 +84,43 @@ export default function PvPArena({ params }: { params: Promise<{ matchId: string
           try {
             const userRef = doc(db, "users", user.uid);
             const snap = await getDoc(userRef);
-            if (snap.exists()) {
-              const currentXP = snap.data().xp || 0;
-              const newXP = currentXP + 50; // Bonus besar untuk pemenang PvP
+            
+            const data = snap.exists() ? snap.data() : {};
+            const currentXP = data.xp || 0;
+            const newXP = currentXP + 50; // Bonus besar untuk pemenang PvP
+            const path = match.path;
+            
+            const updateData: any = {};
+
+            // Tentukan field berdasarkan path
+            const todayStr = new Date().toISOString().split("T")[0];
+            if (path === "samurai") {
+              updateData.xpSamurai = (data.xpSamurai || 0) + 50;
+              const currentHistory = data.historyXPSamurai || {};
+              const todayXP = currentHistory[todayStr] || 0;
+              updateData.historyXPSamurai = {
+                ...currentHistory,
+                [todayStr]: todayXP + 50
+              };
+            } else {
+              updateData.xpDragon = (data.xpDragon || 0) + 50;
+              const currentHistory = data.historyXPDragon || {};
+              const todayXP = currentHistory[todayStr] || 0;
+              updateData.historyXPDragon = {
+                ...currentHistory,
+                [todayStr]: todayXP + 50
+              };
+            }
+              
+              updateData.xp = newXP;
               
               let newRank = "Warrior";
               if (newXP >= 600) newRank = "Grandmaster";
               else if (newXP >= 300) newRank = "Master";
               else if (newXP >= 100) newRank = "Elite";
+              updateData.rank = newRank;
 
-              // Mencatat log XP harian
-              const todayStr = new Date().toISOString().split("T")[0];
-              const currentHistory = snap.data().historyXP || {};
-              const todayXP = currentHistory[todayStr] || 0;
-
-              await updateDoc(userRef, { 
-                xp: newXP, 
-                rank: newRank,
-                historyXP: {
-                  ...currentHistory,
-                  [todayStr]: todayXP + 50
-                }
-              });
-            }
+            await setDoc(userRef, updateData, { merge: true });
           } catch (err) {
             console.error("Gagal memperbarui XP PvP:", err);
           }
